@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Hifz Companion</string>
+    <string name="form_email">Email address</string>
+    <string name="form_password">Password</string>
+    <string name="btn_logIn">Log in</string>
+    <string name="reset_password">RESET PASSWORD</string>
+    <string name="textBtnRegister">Don\'t have an account? Register</string>
+    <string name="textBtnSignIn">Already have an account? Sign In</string>
+    <string name="btn_signUp">Sign Up</string>
+    <string name="log_out">Log Out</string>
+    <string name="app_email">hifzulquran@gmail.com</string>
+    <string name="help_feedback"><![CDATA[Help & Feedback]]></string>
+    <string name="settings">Settings</string>
+    <string name="dashboard">DASHBOARD</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="again">again</string>
+    <string name="hard">hard</string>
+    <string name="good">good</string>
+    <string name="easy">easy</string>
+</resources>

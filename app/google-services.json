@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1018618035149",
+    "firebase_url": "https://acabest-97947.firebaseio.com",
+    "project_id": "acabest-97947",
+    "storage_bucket": "acabest-97947.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018618035149:android:ea721a9a9b0afab6b4e284",
+        "android_client_info": {
+          "package_name": "com.nnems.hifzcompanion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1018618035149-vf3f57am3oj419o0ra45ugc2mh8e76hc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nnems.hifzcompanion",
+            "certificate_hash": "c4acf5a00244e676b6c0281bc1230647963fb593"
+          }
+        },
+        {
+          "client_id": "1018618035149-9s648qv5mnkfuois9fm5krt1d9vgbvk4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1XVJeVHeYiLSUOQ-1CRwMsbmuQSyXzC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018618035149-9s648qv5mnkfuois9fm5krt1d9vgbvk4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
