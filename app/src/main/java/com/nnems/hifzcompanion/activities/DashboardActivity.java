@@ -14,32 +14,23 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.nnems.hifzcompanion.Plan;
 import com.nnems.hifzcompanion.R;
-import com.nnems.hifzcompanion.database.QuranMetaDatabase;
 import com.nnems.hifzcompanion.fragments.DueForMemorizationFragment;
 import com.nnems.hifzcompanion.fragments.DueForRevisionFragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -49,6 +40,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private DueForMemorizationFragment mDueForMemorizationFragment;
     private DueForRevisionFragment mDueForRevisionFragment;
 
+    private FloatingActionButton mAddFab, mAddQuranPlanFab, mAddJuzPlanFab, mAddSurahPlanFab;
+    private TextView mAddQuranPlanText, mAddJuzPlanText, mAddSurahPlanText;
+
     private DrawerLayout mDrawer;
 //    private Button mAddPlanButton;
     private FirebaseAuth mAuth;
@@ -56,6 +50,10 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private FirebaseFirestore mDb;
 
     private static final String TAG = "DashboardActivity";
+
+    private boolean isOpen;
+
+    private Animation mFabOpenAnim, mFabCloseAnim;
 
 
 
@@ -93,9 +91,53 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         tabLayout.setupWithViewPager(viewPager);
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),0);
-        viewPagerAdapter.addFragment(mDueForMemorizationFragment,"Due For Memorization");
+        viewPagerAdapter.addFragment(mDueForMemorizationFragment,"Due For Memorizing");
         viewPagerAdapter.addFragment(mDueForRevisionFragment,"Due For Revision");
         viewPager.setAdapter(viewPagerAdapter);
+
+        mAddFab = findViewById(R.id.fabAddPlan);
+        mAddQuranPlanFab = findViewById(R.id.fabQuranPlan);
+        mAddJuzPlanFab = findViewById(R.id.fabJuzPlan);
+        mAddSurahPlanFab = findViewById(R.id.fabSurahPlan);
+
+        mAddQuranPlanText = findViewById(R.id.textViewAddQuranPlan);
+        mAddJuzPlanText = findViewById(R.id.textViewAddJuzPlan);
+        mAddSurahPlanText = findViewById(R.id.textViewAddSurahPlan);
+
+            isOpen = false;
+
+            mFabOpenAnim = AnimationUtils.loadAnimation(this,R.anim.fab_open);
+            mFabCloseAnim = AnimationUtils.loadAnimation(this,R.anim.fab_close);
+
+            mAddFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(isOpen){
+                        mAddFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_fab_open));
+                        mAddQuranPlanFab.setAnimation(mFabCloseAnim);
+                        mAddJuzPlanFab.setAnimation(mFabCloseAnim);
+                        mAddSurahPlanFab.setAnimation(mFabCloseAnim);
+
+                        mAddQuranPlanText.setVisibility(View.INVISIBLE);
+                        mAddJuzPlanText.setVisibility(View.INVISIBLE);
+                        mAddSurahPlanText.setVisibility(View.INVISIBLE);
+
+                        isOpen = false;
+                    } else{
+
+                        mAddFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_fab_close));
+                        mAddQuranPlanFab.setAnimation(mFabOpenAnim);
+                        mAddJuzPlanFab.setAnimation(mFabOpenAnim);
+                        mAddSurahPlanFab.setAnimation(mFabOpenAnim);
+
+                        mAddQuranPlanText.setVisibility(View.VISIBLE);
+                        mAddJuzPlanText.setVisibility(View.VISIBLE);
+                        mAddSurahPlanText.setVisibility(View.VISIBLE);
+                        isOpen = true;
+                    }
+                }
+            });
+
 
 //        mAddPlanButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
