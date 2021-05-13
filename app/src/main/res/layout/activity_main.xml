@@ -87,6 +87,13 @@
             app:layout_constraintStart_toStartOf="@+id/textViewResetPassword"
             app:layout_constraintTop_toBottomOf="@+id/textViewResetPassword" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            app:layout_constraintEnd_toEndOf="@+id/textView_register"
+            app:layout_constraintStart_toStartOf="@+id/textView_register"
+            app:layout_constraintTop_toBottomOf="@+id/textView_register"/>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

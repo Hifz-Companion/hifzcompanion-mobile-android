@@ -10,9 +10,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HifzulQuran">
-        <activity android:name="com.nnems.hifzcompanion.activities.DashboardActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar.HifzulQuran"></activity>
+        android:theme="@style/Theme.HifzCompanion">
+        <activity
+            android:name="com.nnems.hifzcompanion.activities.DashboardActivity"
+            android:theme="@style/Theme.HifzCompanion.NoActionBar" />
         <activity android:name="com.nnems.hifzcompanion.activities.SignUpActivity" />
         <activity android:name="com.nnems.hifzcompanion.activities.MainActivity">
             <intent-filter>

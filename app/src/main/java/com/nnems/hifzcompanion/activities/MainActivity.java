@@ -3,6 +3,7 @@ package com.nnems.hifzcompanion.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +20,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.nnems.hifzcompanion.Plan;
 import com.nnems.hifzcompanion.R;
+import com.nnems.hifzcompanion.database.QuranMetaDatabase;
+import com.nnems.hifzcompanion.models.Card;
+
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,14 +41,35 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        QuranMetaDatabase quranMetaDatabase = new QuranMetaDatabase(MainActivity.this);
+//        for(int i =0; i<30; i++){
+//            int juzNumber = quranMetaDatabase.getFirstPageOfJuzNumber(i+1);
+//            Log.d(TAG, "Juz "+(i+1)+":"+String.valueOf(juzNumber));
+//        }
+
+//        ProgressDialog progressDialog = new ProgressDialog(this);
+//        Plan.Quran quranPlan = new Plan.Quran(MainActivity.this,progressDialog);
+//        ArrayList<Card> cards = quranPlan.getOneYearPlan(1620000000482L);
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        }).start();
+
+
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+
 
 //        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
 //            @Override
@@ -63,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
         mSignInEmailTextInputLayout = findViewById(R.id.signInEmailtextInputLayout);
         mSignInPasswordTextInputLayout = findViewById(R.id.signInPasswordtextInputLayout);
-
 
 
         mRegisterTextButton.setOnClickListener(new View.OnClickListener() {
@@ -129,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
                                         Log.i(TAG, "signInWithEmail:success");
 //                                        FirebaseUser user = mAuth.getCurrentUser();
 
-                                        Intent intent = new Intent(MainActivity.this, DashboardActivity.class)
-                                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
                                         startActivity(intent);
+                                        finish();
 
                                     } else {
                                         // If sign in fails, display a message to the user.
@@ -142,16 +170,15 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-
-
                 }
 
             }
         });
-        
+
     }
 
-            private void showSnackbar( String snackbarMessage){
+
+    private void showSnackbar( String snackbarMessage){
                 View parentLayout = findViewById(android.R.id.content);
                 Snackbar snackbar = Snackbar.make(parentLayout,snackbarMessage, Snackbar.LENGTH_LONG);
                 View snackbarView = snackbar.getView();
@@ -167,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser != null){
             Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 
