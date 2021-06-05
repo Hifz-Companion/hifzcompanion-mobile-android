@@ -1,55 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/quran_page"
-                android:layout_width="wrap_content"
+                android:id="@+id/due_for_revision_card_quran_page"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
+                android:gravity="center"
                 android:text="Quran Page:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/surah"
-                android:layout_width="wrap_content"
+                android:id="@+id/due_for_revision_card_surah"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:gravity="center"
                 android:text="Surah: 1. Fatihah"
-                app:layout_constraintEnd_toEndOf="@id/quran_page"
-                app:layout_constraintStart_toStartOf="@id/quran_page"
-                app:layout_constraintTop_toBottomOf="@id/quran_page" />
+                app:layout_constraintEnd_toEndOf="@id/due_for_revision_card_quran_page"
+                app:layout_constraintStart_toStartOf="@id/due_for_revision_card_quran_page"
+                app:layout_constraintTop_toBottomOf="@id/due_for_revision_card_quran_page" />
 
             <TextView
-                android:id="@+id/first_ayah"
+                android:id="@+id/due_for_revision_card_first_ayah"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:gravity="center"
                 android:text="1st Ayah: 1"
-                app:layout_constraintEnd_toEndOf="@id/surah"
-                app:layout_constraintStart_toStartOf="@id/surah"
-                app:layout_constraintTop_toBottomOf="@id/surah" />
+                app:layout_constraintEnd_toEndOf="@id/due_for_revision_card_surah"
+                app:layout_constraintStart_toStartOf="@id/due_for_revision_card_surah"
+                app:layout_constraintTop_toBottomOf="@id/due_for_revision_card_surah" />
 
 
             <Button
@@ -63,8 +65,8 @@
                 android:textStyle="bold"
                 app:backgroundTint="@color/darker_white"
                 app:layout_constraintEnd_toStartOf="@id/hard_button"
-                app:layout_constraintStart_toStartOf="@id/first_ayah"
-                app:layout_constraintTop_toBottomOf="@id/first_ayah" />
+                app:layout_constraintStart_toStartOf="@id/due_for_revision_card_first_ayah"
+                app:layout_constraintTop_toBottomOf="@id/due_for_revision_card_first_ayah" />
 
             <Button
                 android:id="@+id/hard_button"
@@ -73,13 +75,13 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/hard"
-                android:textColor="@color/yellow"
+                android:textColor="@color/deepYellow"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/darker_white"
-                app:layout_constraintEnd_toEndOf="@id/first_ayah"
+                app:layout_constraintEnd_toEndOf="@id/due_for_revision_card_first_ayah"
                 app:layout_constraintStart_toEndOf="@id/again_button"
-                app:layout_constraintTop_toBottomOf="@id/first_ayah" />
+                app:layout_constraintTop_toBottomOf="@id/due_for_revision_card_first_ayah" />
 
             <Button
                 android:id="@+id/good_button"

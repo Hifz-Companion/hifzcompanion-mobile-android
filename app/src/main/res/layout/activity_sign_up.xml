@@ -101,7 +101,7 @@
             android:layout_height="64dp"
             app:layout_constraintEnd_toEndOf="@+id/textView_signIn"
             app:layout_constraintStart_toStartOf="@+id/textView_signIn"
-            app:layout_constraintTop_toBottomOf="@+id/textView_signIn"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView_signIn" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

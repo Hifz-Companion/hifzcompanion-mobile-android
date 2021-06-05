@@ -10,11 +10,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class QuranMetaDatabase {
 
-    private Context mContext;
+    private final Context mContext;
 //    private
 
 
@@ -22,19 +23,19 @@ public class QuranMetaDatabase {
         mContext = context;
     }
 
-    public String jsonDataFromAssets(){
+    public String jsonDataFromAssets() {
 
         String json = null;
 
-        try{
+        try {
             InputStream inputStream = mContext.getAssets().open("quranmetadata.json");
             int sizeOfFile = inputStream.available();
             byte[] bufferData = new byte[sizeOfFile];
             inputStream.read(bufferData);
             inputStream.close();
 
-            json = new String(bufferData,"UTF-8");
-        }catch (IOException e){
+            json = new String(bufferData, StandardCharsets.UTF_8);
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -42,7 +43,7 @@ public class QuranMetaDatabase {
         return json;
     }
 
-    public JSONObject getQuranMeta(){
+    public JSONObject getQuranMeta() {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(jsonDataFromAssets());
@@ -65,11 +66,11 @@ public class QuranMetaDatabase {
         return juzMeta;
     }
 
-    public JSONObject getSurahMeta(){
+    public JSONObject getSurahMeta() {
         JSONObject jsonObject = getQuranMeta();
         JSONObject surahMeta = null;
         try {
-           surahMeta = jsonObject.getJSONObject("surahs");
+            surahMeta = jsonObject.getJSONObject("surahs");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -89,7 +90,7 @@ public class QuranMetaDatabase {
         return pagesMeta;
     }
 
-    public JSONArray getJuzReferences(){
+    public JSONArray getJuzReferences() {
         JSONObject jsonObject = getJuzMeta();
         JSONArray juzReferences = null;
 
@@ -102,7 +103,7 @@ public class QuranMetaDatabase {
         return juzReferences;
     }
 
-    public JSONArray getSurahReferences(){
+    public JSONArray getSurahReferences() {
         JSONObject jsonObject = getSurahMeta();
         JSONArray surahReferences = null;
 
@@ -132,7 +133,7 @@ public class QuranMetaDatabase {
         JSONArray jsonArray = getSurahReferences();
         JSONObject surahReference = null;
         try {
-            surahReference = jsonArray.getJSONObject(surahNumber-1);
+            surahReference = jsonArray.getJSONObject(surahNumber - 1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -147,7 +148,26 @@ public class QuranMetaDatabase {
         return surahEnglishName;
     }
 
-    public  int getPageSurahNumber(int indexOfPage) {
+    public String getSurahNameList(int surahNumber) {
+        JSONArray jsonArray = getSurahReferences();
+        JSONObject surahReference = null;
+        try {
+            surahReference = jsonArray.getJSONObject(surahNumber - 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String name = null;
+        try {
+            name = surahNumber + ". " + surahReference.getString("englishName") + " (" + surahReference.getString("name") + ")";
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return name;
+    }
+
+    public int getPageSurahNumber(int indexOfPage) {
         JSONArray jsonArray = getPageReferences();
         JSONObject pageReference = null;
 
@@ -167,7 +187,7 @@ public class QuranMetaDatabase {
         return surahNumber;
     }
 
-    public  int getPageFirstAyahNumber(int indexOfPage) {
+    public int getPageFirstAyahNumber(int indexOfPage) {
         JSONArray jsonArray = getPageReferences();
         JSONObject pageReference = null;
 
@@ -187,16 +207,15 @@ public class QuranMetaDatabase {
         return ayahNumber;
     }
 
-    public int getFirstPageOfJuzNumber(int juzNumber){
+    public int getFirstPageOfJuzNumber(int juzNumber) {
         int firstPageOfJuzNumber = 0;
-
 
 
         JSONArray jsonArray = getJuzReferences();
         JSONObject juzReference = null;
 
         try {
-            juzReference = jsonArray.getJSONObject(juzNumber-1);
+            juzReference = jsonArray.getJSONObject(juzNumber - 1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -256,17 +275,17 @@ public class QuranMetaDatabase {
 //        return firstPageOfJuzAyahNumber;
 //    }
 
-    public ArrayList<JSONObject> getSurahPagesList(int surahNumber){
+    public ArrayList<JSONObject> getSurahPagesList(int surahNumber) {
         ArrayList<JSONObject> surahPagesList = new ArrayList<>();
 
         JSONArray jsonArray = getPageReferences();
 
         JSONObject pageReference;
 
-        for(int i =0; i < CONSTANTS.PAGES; i++){
+        for (int i = 0; i < CONSTANTS.PAGES; i++) {
             try {
-               pageReference = jsonArray.getJSONObject(i);
-                if(pageReference.getInt("surah") == surahNumber){
+                pageReference = jsonArray.getJSONObject(i);
+                if (pageReference.getInt("surah") == surahNumber) {
                     surahPagesList.add(pageReference);
                 }
             } catch (JSONException e) {

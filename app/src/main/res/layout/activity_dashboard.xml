@@ -7,7 +7,7 @@
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true"
     tools:context=".activities.DashboardActivity">
-<!--    tools:openDrawer="start"-->
+    <!--    tools:openDrawer="start"-->
 
 
     <LinearLayout
@@ -99,7 +99,6 @@
                 app:srcCompat="@drawable/ic_fab_surah" />
 
 
-
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:id="@+id/coordinatorLayout"
                 android:layout_width="match_parent"
@@ -179,7 +178,6 @@
     </LinearLayout>
 
 
-
     <com.google.android.material.navigation.NavigationView
 
         android:id="@+id/navigation_view"
@@ -193,7 +191,6 @@
         app:menu="@menu/drawermenu">
 
     </com.google.android.material.navigation.NavigationView>
-
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -2,7 +2,7 @@ package com.nnems.hifzcompanion.models;
 
 public class Card {
     int mId;
-    int mPageNumber;
+    int mPageNo;
     String mTitle;
     Surah mSurah;
     int mJuz;
@@ -11,15 +11,15 @@ public class Card {
     String mDueDateInWords;
     int mLapses;
     long mInterval;
-    Double mEase;
+    double mEase;
     String mPhase;
 
     public Card() {
     }
 
-    public Card(int id, int pageNumber, String title, Surah surah, int juz, int ayah, long dueDate, String dueDateInWords) {
+    public Card(int id, int pageNo, String title, Surah surah, int juz, int ayah, long dueDate, String dueDateInWords) {
         mId = id;
-        mPageNumber = pageNumber;
+        mPageNo = pageNo;
         mTitle = title;
         mSurah = surah;
         mJuz = juz;
@@ -32,6 +32,20 @@ public class Card {
         mPhase = "memorizing";
     }
 
+    public Card(int id, int pageNo, String title, int juz, long dueDate, String dueDateInWords) {
+        mId = id;
+        mPageNo = pageNo;
+        mTitle = title;
+        mJuz = juz;
+        mDueDate = dueDate;
+        mDueDateInWords = dueDateInWords;
+        mLapses = 0;
+        mInterval = 1;
+        mEase = 2.5;
+        mPhase = "memorizing";
+    }
+
+
     public int getId() {
         return mId;
     }
@@ -40,12 +54,12 @@ public class Card {
         mId = id;
     }
 
-    public int getPageNumber() {
-        return mPageNumber;
+    public int getPageNo() {
+        return mPageNo;
     }
 
-    public void setPageNumber(int pageNumber) {
-        mPageNumber = pageNumber;
+    public void setPageNo(int pageNo) {
+        mPageNo = pageNo;
     }
 
     public String getTitle() {
@@ -112,11 +126,11 @@ public class Card {
         mInterval = interval;
     }
 
-    public Double getEase() {
+    public double getEase() {
         return mEase;
     }
 
-    public void setEase(Double ease) {
+    public void setEase(double ease) {
         mEase = ease;
     }
 

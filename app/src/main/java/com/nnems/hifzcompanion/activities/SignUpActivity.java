@@ -1,8 +1,5 @@
 package com.nnems.hifzcompanion.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,7 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
     EditText mSignUpEmailfield, mSignUpPasswordField, mSignUpConfirmPasswordField;
     TextView mSignInTextButton;
     Button mSignUpButton;
-    TextInputLayout mSignUpEmailTextInputLayout,mSignUpPasswordTextInputLayout,
+    TextInputLayout mSignUpEmailTextInputLayout, mSignUpPasswordTextInputLayout,
             mSignUpConfirmPasswordTextInputLayout;
 
     private FirebaseAuth mAuth;
@@ -102,12 +102,11 @@ public class SignUpActivity extends AppCompatActivity {
         } else if (password.trim().isEmpty()) {
             mSignUpPasswordTextInputLayout.setError("Password should not be empty");
             showSnackbar(fieldEmptySnackbarMessage);
-        }else if (confirmPassword.trim().isEmpty()){
+        } else if (confirmPassword.trim().isEmpty()) {
             mSignUpPasswordTextInputLayout.setError("Password should not be empty");
             showSnackbar(fieldEmptySnackbarMessage);
-        }
-        else {
-            if(passwordsMatch()){
+        } else {
+            if (passwordsMatch()) {
 
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -122,35 +121,31 @@ public class SignUpActivity extends AppCompatActivity {
                                     String email = user.getEmail();
                                     String userId = user.getUid();
                                     Calendar c = Calendar.getInstance();
-                                    c.set(Calendar.HOUR_OF_DAY,0);
-                                    c.set(Calendar.MINUTE,0);
-                                    c.set(Calendar.SECOND,0);
+                                    c.set(Calendar.HOUR_OF_DAY, 0);
+                                    c.set(Calendar.MINUTE, 0);
+                                    c.set(Calendar.SECOND, 0);
+                                    c.set(Calendar.MILLISECOND, 0);
+
                                     Date dateNow = c.getTime();
 
                                     long registrationDate = dateNow.getTime();
 
-                                    Map<String,Object> memo = new HashMap<>();
-//                                    QuranMetaDatabase quranMetaDatabase = new QuranMetaDatabase(SignUpActivity.this);
-//                                    Plan.Quran quranPlan = new Plan.Quran(quranMetaDatabase);
-//                                    ArrayList<Map<String,Object>> cards = quranPlan.getOneYearPlan(registrationDate);
-//
-//                                    memo.put("plan","oneYear");
-//                                    memo.put("target","quran");
-//                                    memo.put("cards", cards);
+                                    Map<String, Object> memo = new HashMap<>();
 
-                                    User newUser = new User(email,registrationDate,memo);
+
+                                    User newUser = new User(email, registrationDate, memo);
 
                                     mDb.collection("users")
                                             .document(userId)
                                             .set(newUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Log.i(email,"data added");
+                                            Log.i(email, "data added");
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.i(email,"data not added");
+                                            Log.i(email, "data not added");
                                         }
                                     });
 
@@ -168,15 +163,15 @@ public class SignUpActivity extends AppCompatActivity {
                                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                     Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                             Toast.LENGTH_SHORT).show();
-                                     mSignUpEmailfield.setText("");
-                                     mSignUpPasswordField.setText("");
-                                     mSignUpConfirmPasswordField.setText("");
+                                    mSignUpEmailfield.setText("");
+                                    mSignUpPasswordField.setText("");
+                                    mSignUpConfirmPasswordField.setText("");
                                 }
                             }
                         });
 
 
-            } else{
+            } else {
                 showSnackbar(passWordUmatch);
                 mSignUpPasswordField.setText("");
                 mSignUpConfirmPasswordField.setText("");
@@ -192,9 +187,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void showSnackbar( String snackbarMessage){
+    private void showSnackbar(String snackbarMessage) {
         View parentLayout = findViewById(android.R.id.content);
-        Snackbar snackbar = Snackbar.make(parentLayout,snackbarMessage, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(parentLayout, snackbarMessage, Snackbar.LENGTH_LONG);
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(getResources().getColor(R.color.red));
         snackbar.show();

@@ -10,7 +10,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
     <color name="darker_white">#CCCCCC</color>
-    <color name="yellow"> #EACE09</color>
+    <color name="yellow">#EACE09</color>
     <color name="blue">#00008b</color>
     <color name="lightGrey">#5F6670</color>
+    <color name="deepYellow">#999900</color>
 </resources>

@@ -5,7 +5,7 @@ import java.util.Map;
 public class User {
     String mEmail;
     Long mRegistrationDate;
-    Map<String,Object> mMemo;
+    Map<String, Object> mMemo;
 
 
     public User() {

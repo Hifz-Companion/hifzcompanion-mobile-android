@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nnems.hifzcompanion">
 
-
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,11 +9,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HifzCompanion">
+        <activity android:name=".activities.MainActivity"></activity>
+        <activity android:name=".activities.HelpActivity" />
         <activity
-            android:name="com.nnems.hifzcompanion.activities.DashboardActivity"
+            android:name=".activities.DashboardActivity"
             android:theme="@style/Theme.HifzCompanion.NoActionBar" />
-        <activity android:name="com.nnems.hifzcompanion.activities.SignUpActivity" />
-        <activity android:name="com.nnems.hifzcompanion.activities.MainActivity">
+        <activity android:name=".activities.SignUpActivity" />
+        <activity
+            android:name=".activities.SplashScreenActivity"
+            android:theme="@style/Theme.HifzCompanion.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

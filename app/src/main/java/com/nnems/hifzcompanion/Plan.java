@@ -6,6 +6,7 @@ import com.nnems.hifzcompanion.database.QuranMetaDatabase;
 import com.nnems.hifzcompanion.models.Card;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,9 +17,11 @@ public class Plan {
     public static class Quran {
         private static final String TAG = "Quran";
         private final QuranMetaDatabase mQuranMetaDatabase;
+        private final JSONObject mJSONObject;
 
         public Quran(Context context) {
             mQuranMetaDatabase = new QuranMetaDatabase(context);
+            mJSONObject = mQuranMetaDatabase.getQuranMeta();
         }
 
         public ArrayList<Card> getOneYearPlan(long registrationDate) {
@@ -218,40 +221,7 @@ public class Plan {
             }
             return cards;
         }
-//        private void setUserPlan(ArrayList<Card> cards, String plan, String target) {
-//
-//            Map<String, Object> memo = new HashMap<>();
-//
-//            long startDate = mRegistrationDate + 86400000L;
-//
-//            memo.put("plan", plan);
-//            memo.put("target", target);
-//            memo.put("cards", cards);
-//            memo.put("startDate", startDate);
-//
-//            Map<String, Object> userPlan = new HashMap<>();
-//            userPlan.put("email", mEmail);
-//            userPlan.put("memo", memo);
-//            userPlan.put("registrationDate", mRegistrationDate);
-//
-//
-//            mDb.collection("users")
-//                    .document(mUserId)
-//                    .update(userPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                @Override
-//                public void onSuccess(Void aVoid) {
-//
-//                    Log.d(TAG, mEmail + " Plan added");
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception e) {
-//                    Log.d(TAG, "onFailure: " + e.getMessage());
-//                    Log.d(TAG, mEmail + "Plan not added");
-//                }
-//            });
-//
-//        }
+
 
     }
 

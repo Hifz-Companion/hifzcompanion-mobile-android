@@ -1,12 +1,13 @@
 package com.nnems.hifzcompanion.activities;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -14,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,14 +40,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.nnems.hifzcompanion.CONSTANTS;
 import com.nnems.hifzcompanion.Plan;
 import com.nnems.hifzcompanion.R;
+import com.nnems.hifzcompanion.database.QuranMetaDatabase;
 import com.nnems.hifzcompanion.fragments.DueForMemorizationFragment;
 import com.nnems.hifzcompanion.fragments.DueForRevisionFragment;
 import com.nnems.hifzcompanion.models.Card;
@@ -64,6 +70,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private DueForRevisionFragment mDueForRevisionFragment;
     private FloatingActionButton mFabAdd, mFabAddQuranPlan, mFabAddJuzPlan, mFabAddSurahPlan;
     private TextView mAddQuranPlanText, mAddJuzPlanText, mAddSurahPlanText;
+    private NavigationView mNavigationView;
     private DrawerLayout mDrawer;
     //    private Button mAddPlanButton;
     private FirebaseAuth mAuth;
@@ -76,10 +83,12 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
     private String mQuranPlan, mJuzPlan, mSurahPlan, mTarget;
     private int mJuzNumber, mSurahNumber;
+    private ArrayList<String> mSurahNameList;
     private long mRegistrationDate;
     private String mEmail;
     private String mUserId;
     private ProgressDialog mProgressDialog;
+    private Map<String, Object> mMemo;
 
 
     @Override
@@ -88,6 +97,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         setContentView(R.layout.activity_dashboard);
 
         mProgressDialog = new ProgressDialog(this);
+        mNavigationView = findViewById(R.id.navigation_view);
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -98,9 +108,20 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         mEmail = user.getEmail();
         mUserId = user.getUid();
 
-//        ProgressDialog progressDialog = new ProgressDialog(this);
-//        Plan.Quran quranPlan = new Plan.Quran(this,progressDialog);
-//        ArrayList<Card> cards = quranPlan.getOneYearPlan(1620000000482L);
+        View headerView = mNavigationView.getHeaderView(0);
+        TextView userEmailDisplay = headerView.findViewById(R.id.header_user_email_display);
+        userEmailDisplay.setText(mEmail);
+
+        mSurahNameList = new ArrayList<>();
+        mSurahNameList.add("Choose Surah");
+        QuranMetaDatabase quranMetaDatabase = new QuranMetaDatabase(this);
+        for (int i = 0; i < CONSTANTS.SURAHS; i++) {
+            int index = i + 1;
+            String surahNames = quranMetaDatabase.getSurahNameList(index);
+//            Log.d(TAG, (surahNames + "\n"));
+            mSurahNameList.add(surahNames);
+        }
+
 
         DocumentReference docRef = mDb.collection("users").document(mUserId);
 
@@ -113,8 +134,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                     DocumentSnapshot document = task.getResult();
                     assert document != null;
                     if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         mRegistrationDate = document.getLong("registrationDate");
+                        mMemo = (Map<String, Object>) document.get("memo");
                         Log.i(TAG, String.valueOf(mRegistrationDate));
 
                     } else {
@@ -288,14 +309,13 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                                 break;
                             case "error":
                                 Toast.makeText(DashboardActivity.this,
-                                        "Please Choose A Plan", Toast.LENGTH_SHORT).show();
+                                        "Please Choose A Plan", Toast.LENGTH_LONG).show();
                                 Log.i(TAG, "Error");
                                 break;
 
 
                         }
                         show.dismiss();
-//                            mProgressDialog.dismiss();
                     }
                 });
 
@@ -362,8 +382,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                             case 6:
                                 mJuzPlan = "nineWeeks";
                                 break;
-                            default:
-                                mJuzPlan = "";
+
                         }
                     }
 
@@ -377,6 +396,48 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 createMyPlanButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Plan.Juz juzPlan = new Plan.Juz(DashboardActivity.this, mJuzNumber);
+                        ArrayList<Card> cards = new ArrayList<>();
+                        mTarget = "juz";
+
+                        if (mJuzNumber == 0) {
+                            Toast.makeText(DashboardActivity.this, "Please Choose Juz", Toast.LENGTH_LONG).show();
+                        } else {
+
+                            switch (mJuzPlan) {
+                                case "twoWeeks":
+                                    cards = juzPlan.getTwoWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "threeWeeks":
+                                    cards = juzPlan.getThreeWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "fiveWeeks":
+                                    cards = juzPlan.getFiveWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "sixWeeks":
+                                    cards = juzPlan.getSixWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "sevenWeeks":
+                                    cards = juzPlan.getSevenWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "nineWeeks":
+                                    cards = juzPlan.getNineWeeksPlan(mRegistrationDate);
+                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    break;
+                                case "error":
+                                    Toast.makeText(DashboardActivity.this,
+                                            "Please Choose A Plan", Toast.LENGTH_LONG).show();
+                                    Log.i(TAG, "Error");
+                                    break;
+                            }
+                        }
+
+
                         show.dismiss();
                     }
                 });
@@ -396,8 +457,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 show = builder.show();
 
                 Spinner mSpinnerSurah = dialogView.findViewById(R.id.surahSpinner);
-                ArrayAdapter<CharSequence> surahAdapter = ArrayAdapter.createFromResource(DashboardActivity.this,
-                        R.array.surah_plans, android.R.layout.simple_spinner_item);
+                ArrayAdapter<String> surahAdapter = new ArrayAdapter<>(DashboardActivity.this, android.R.layout.simple_spinner_item, mSurahNameList);
                 surahAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 mSpinnerSurah.setAdapter(surahAdapter);
 
@@ -438,8 +498,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                             case 4:
                                 mSurahPlan = "oneP/3D";
                                 break;
-                            default:
-                                mSurahPlan = "";
                         }
                     }
 
@@ -454,6 +512,41 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 createMyPlanButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        Plan.Surah surahPlan = new Plan.Surah(DashboardActivity.this, mSurahNumber);
+                        ArrayList<Card> cards = new ArrayList<>();
+                        mTarget = "surah";
+
+                        if (mSurahNumber == 0) {
+                            Toast.makeText(DashboardActivity.this, "Please Choose Surah", Toast.LENGTH_SHORT).show();
+                        } else {
+                            switch (mSurahPlan) {
+                                case "twoP/D":
+                                    cards = surahPlan.getTwoPagesPerDayPlan(mRegistrationDate);
+                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    break;
+                                case "oneP/D":
+                                    cards = surahPlan.getOnePagePerDayPlan(mRegistrationDate);
+                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    break;
+                                case "oneP/2D":
+                                    cards = surahPlan.getOnePagePerTwoDaysPlan(mRegistrationDate);
+                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    break;
+                                case "oneP/3D":
+                                    cards = surahPlan.getOnePagePerThreeDaysPlan(mRegistrationDate);
+                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    break;
+                                case "error":
+                                    Toast.makeText(DashboardActivity.this,
+                                            "Please Choose A Plan", Toast.LENGTH_LONG).show();
+                                    Log.i(TAG, "Error");
+                                    break;
+
+                            }
+                        }
+
+
                         show.dismiss();
                     }
                 });
@@ -487,16 +580,25 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
             @Override
             public void onSuccess(Void aVoid) {
 
+                showSnackbar(getString(R.string.hifz_plan_created_snackbar_text));
                 Log.d(TAG, mEmail + " Plan added");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
-                Log.d(TAG, mEmail + "Plan not added");
+                Log.d(TAG, mEmail + " Plan not added");
             }
         });
 
+    }
+
+    private void showSnackbar(String snackbarMessage) {
+        View parentLayout = findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(parentLayout, snackbarMessage, Snackbar.LENGTH_LONG);
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(getResources().getColor(R.color.purple_500));
+        snackbar.show();
     }
 
     @Override
@@ -508,9 +610,79 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 startActivity(intent);
                 finish();
                 break;
+
+            case R.id.nav_help:
+                Intent helpActivity = new Intent(DashboardActivity.this, HelpActivity.class);
+                startActivity(helpActivity);
+                break;
         }
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.dashboard_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_current_plan:
+                deleteCurrentPlan();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteCurrentPlan() {
+        MaterialAlertDialogBuilder deletePlanDialog = new MaterialAlertDialogBuilder(DashboardActivity.this);
+        deletePlanDialog.setTitle("Delete Current Plan?")
+                .setIcon(R.drawable.ic_delete_red)
+                .setMessage(R.string.delete_plan_dialog_message);
+
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.delete_plan_dialog, null);
+
+        deletePlanDialog.setView(dialogView)
+                .setPositiveButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).setNeutralButton("DELETE PLAN", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText deleteEditText = dialogView.findViewById(R.id.delete_plan_dialog_edittextView);
+
+                if (deleteEditText.getText().equals("delete")) {
+                    if (mMemo != null) {
+                        mDb.collection("users")
+                                .document(mUserId).update("memo", FieldValue.delete()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(DashboardActivity.this, "Your current plan has been deleted", Toast.LENGTH_LONG).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(DashboardActivity.this, "PLan not deleted. Try Again", Toast.LENGTH_LONG).show();
+                                Log.d(TAG, "onFailure: " + e.getMessage());
+
+                            }
+                        });
+                    } else {
+                        Toast.makeText(DashboardActivity.this, "You have no ongoing plans.", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(DashboardActivity.this, "Please enter 'delete' to proceed", Toast.LENGTH_LONG).show();
+                }
+            }
+        }).show();
+
+
     }
 
     @Override

@@ -19,6 +19,12 @@
     <string name="hard">hard</string>
     <string name="good">good</string>
     <string name="easy">easy</string>
+    <string name="no_page_due_for_memorizing_text">You have no pages due for Memorizing</string>
+    <string name="no_page_due_for_revision_text">You have no pages due for Revision</string>
+    <string name="no_ongoing_plan_create_plan">"You have no ongoing memorization plan. Create a Plan to see pages"</string>
+    <string name="hifz_plan_created_snackbar_text">Your hifz plan has been created. Your first page will appear tomorrow in shaa Allah</string>
+    <string name="delete_plan_dialog_message">Are you sure you want to delete the current plan. You will not see any more of your memorization pages and you will not be given any pages to review. If you still want to proceed, type \"delete\" in the text area below and click on \"DELETE PLAN\".</string>
+    <string name="help_text_view_text">I am writing an app using firebase as a backend, and I am trying to write to the database, but am getting \"Error 7: Missing or insufficient permissions.\" Someone told me cloud functions bypasses the firebase permissions, so I\'m not sure what could be causing this error. Can someone please take a look?I am writing an app using firebase as a backend, and I am trying to write to the database, but am getting \"Error 7: Missing or insufficient permissions.\" Someone told me cloud functions bypasses the firebase permissions, so I\'m not sure what could be causing this error. Can someone please take a look?I am writing an app using firebase as a backend, and I am trying to write to the database, but am getting \"Error 7: Missing or insufficient permissions.\" Someone told me cloud functions bypasses the firebase permissions, so I\'m not sure what could be causing this error. Can someone please take a look?</string>
 
     <string-array name="quran_plans">
         <item>Choose Plan</item>
