@@ -1,26 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activities.HelpActivity">
 
+        <TextView
+            android:id="@+id/help_about_app_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/help_about_app_text"
+            android:textColorLink="@color/purple_500"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/help_textView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/help_text_view_text"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/help_plans_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/help_plans_text"
+            android:textColorLink="@color/purple_500"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/help_about_app_textView"
+            app:layout_constraintStart_toStartOf="@+id/help_about_app_textView"
+            app:layout_constraintTop_toBottomOf="@+id/help_about_app_textView" />
+
+        <TextView
+            android:id="@+id/help_contact_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/help_contact_text"
+            android:textColorLink="@color/purple_500"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/help_plans_textView"
+            app:layout_constraintStart_toStartOf="@+id/help_plans_textView"
+            app:layout_constraintTop_toBottomOf="@+id/help_plans_textView" />
+
+        <TextView
+            android:id="@+id/help_concerns_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:text="@string/help_do_you_have_concerns_text"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/help_send_feedback_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/help_send_feedback_text"
+            android:textColor="@color/lightBlue"
+            android:textStyle="bold|italic"
+            app:layout_constraintEnd_toEndOf="@+id/help_concerns_textView"
+            app:layout_constraintStart_toStartOf="@+id/help_concerns_textView"
+            app:layout_constraintTop_toBottomOf="@+id/help_concerns_textView" />
+
+        <TextView
+            android:id="@+id/help_develped_by_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="@string/help_develped_by"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

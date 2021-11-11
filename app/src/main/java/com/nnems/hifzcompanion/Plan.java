@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -18,13 +19,52 @@ public class Plan {
         private static final String TAG = "Quran";
         private final QuranMetaDatabase mQuranMetaDatabase;
         private final JSONObject mJSONObject;
+        private long mMidNight;
 
         public Quran(Context context) {
             mQuranMetaDatabase = new QuranMetaDatabase(context);
             mJSONObject = mQuranMetaDatabase.getQuranMeta();
+
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+
+            Date dateNow = c.getTime();
+
+
+            mMidNight= dateNow.getTime();
         }
 
-        public ArrayList<Card> getOneYearPlan(long registrationDate) {
+        public ArrayList<Card> getOneYearPlan() {
+            ArrayList<Card> cards = new ArrayList<>();
+
+                for (int i = 0; i < CONSTANTS.PAGES; i++) {
+
+                    int cardNumber = i + 1; //same as pageNumber , id and title
+
+                    //   accessing data for surah object
+                    int id = mQuranMetaDatabase.getPageSurahNumber(i);
+                    String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(id);
+                    com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(id, surahEnglishName);
+
+                    int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
+
+                    float f = (float) (cardNumber) / 2.0f;
+                    int dayToMemorize = Math.round(f);
+                    long dueDate = mMidNight + ((long) dayToMemorize * 86400000L);
+
+                    Date date = new Date(dueDate);
+                    String dueDateInWords = date.toString();
+
+                    cards.add(new Card(cardNumber, cardNumber, "Quran Page " + cardNumber, surah, 0, ayah, dueDate, dueDateInWords));
+                }
+
+            return cards;
+        }
+
+        public ArrayList<Card> getTwoYearPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             for (int i = 0; i < CONSTANTS.PAGES; i++) {
@@ -38,9 +78,7 @@ public class Plan {
 
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
 
-                float f = (float) (cardNumber) / 2.0f;
-                int dayToMemorize = Math.round(f);
-                long dueDate = registrationDate + ((long) dayToMemorize * 86400000L);
+                long dueDate = mMidNight + ((long) cardNumber * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -50,31 +88,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getTwoYearPlan(long registrationDate) {
-            ArrayList<Card> cards = new ArrayList<>();
-
-            for (int i = 0; i < CONSTANTS.PAGES; i++) {
-
-                int cardNumber = i + 1; //same as pageNumber , id and title
-
-                //   accessing data for surah object
-                int id = mQuranMetaDatabase.getPageSurahNumber(i);
-                String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(id);
-                com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(id, surahEnglishName);
-
-                int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
-
-                long dueDate = registrationDate + ((long) cardNumber * 86400000L);
-
-                Date date = new Date(dueDate);
-                String dueDateInWords = date.toString();
-
-                cards.add(new Card(cardNumber, cardNumber, "Quran Page " + cardNumber, surah, 0, ayah, dueDate, dueDateInWords));
-            }
-            return cards;
-        }
-
-        public ArrayList<Card> getThreeYearPlan(long registrationDate) {
+        public ArrayList<Card> getThreeYearPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemoList = new ArrayList<>();
@@ -97,7 +111,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
 
                 long dayToMemorize = daysToMemoList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -107,7 +121,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getFourYearPlan(long registrationDate) {
+        public ArrayList<Card> getFourYearPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -129,7 +143,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -139,7 +153,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getFiveYearPlan(long registrationDate) {
+        public ArrayList<Card> getFiveYearPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> initialDaysToMemorizeList = new ArrayList<>();
@@ -171,7 +185,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(i);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -181,7 +195,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getSixYearPlan(long registrationDate) {
+        public ArrayList<Card> getSixYearPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -212,7 +226,7 @@ public class Plan {
 
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -230,11 +244,24 @@ public class Plan {
         private final int mJuzNumber;
         private final int mFirstPageOfJuz;
         private int mJuzPages;
+        private long mMidNight;
 
         public Juz(Context context, int juzNumber) {
             mQuranMetaDatabase = new QuranMetaDatabase(context);
             mJuzNumber = juzNumber;
             mJuzPages = 20;
+
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+
+            Date dateNow = c.getTime();
+
+
+            mMidNight = dateNow.getTime();
+
             if (juzNumber == 1) {
                 mJuzPages = 21;
             } else if (juzNumber == 30) {
@@ -243,14 +270,14 @@ public class Plan {
             mFirstPageOfJuz = mQuranMetaDatabase.getFirstPageOfJuzNumber(juzNumber);
         }
 
-        public ArrayList<Card> getTwoWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getTwoWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             for (int i = 0; i < mJuzPages; i++) {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -260,7 +287,7 @@ public class Plan {
 
                 float f = (float) (cardNumber) / 2;
                 int dayToMemorize = Math.round(f);
-                long dueDate = registrationDate + ((long) dayToMemorize * 86400000);
+                long dueDate = mMidNight + ((long) dayToMemorize * 86400000);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -271,14 +298,14 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getThreeWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getThreeWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             for (int i = 0; i < mJuzPages; i++) {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -287,7 +314,7 @@ public class Plan {
 
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
-                long dueDate = registrationDate + ((long) cardNumber * 86400000L);
+                long dueDate = mMidNight  + ((long) cardNumber * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -297,7 +324,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getFiveWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getFiveWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -313,7 +340,7 @@ public class Plan {
             for (int i = 0; i < mJuzPages; i++) {
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -323,7 +350,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -333,7 +360,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getSixWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getSixWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -350,7 +377,7 @@ public class Plan {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -360,7 +387,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -370,7 +397,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getSevenWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getSevenWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> initialDaysToMemorizeList = new ArrayList<>();
@@ -395,7 +422,7 @@ public class Plan {
             for (int i = 0; i < mJuzPages; i++) {
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -405,7 +432,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -415,7 +442,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getNineWeeksPlan(long registrationDate) {
+        public ArrayList<Card> getNineWeeksPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -435,7 +462,7 @@ public class Plan {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfJuz + i;
-                String title = "Juz " + mJuzNumber + "Page " + i + 1;
+                String title = "Juz " + mJuzNumber + ", Page " + i + 1;
 
                 int surahId = mQuranMetaDatabase.getPageSurahNumber(pageNo - 1);
                 String surahEnglishName = mQuranMetaDatabase.getSurahEnglishName(surahId);
@@ -445,7 +472,7 @@ public class Plan {
                 int ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -462,10 +489,23 @@ public class Plan {
         private final int mSurahNumber;
         private int mFirstPageOfSurah;
         private int mSurahPages;
+        private long mMidNight;
 
         public Surah(Context context, int surahNumber) {
             mQuranMetaDatabase = new QuranMetaDatabase(context);
             mSurahNumber = surahNumber;
+
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+
+            Date dateNow = c.getTime();
+
+
+            mMidNight = dateNow.getTime();
+
             mSurahPages = mQuranMetaDatabase.getSurahPagesList(surahNumber).size();
 
             if (mSurahPages == 0) {
@@ -504,14 +544,14 @@ public class Plan {
 
         }
 
-        public ArrayList<Card> getTwoPagesPerDayPlan(long registrationDate) {
+        public ArrayList<Card> getTwoPagesPerDayPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             for (int i = 0; i < mSurahPages; i++) {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfSurah + i;
-                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ",Page " + i + 1;
+                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ", Page " + i + 1;
 
                 com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(mSurahNumber, mQuranMetaDatabase.getSurahEnglishName(mSurahNumber));
 
@@ -523,7 +563,7 @@ public class Plan {
 
                 float f = (float) (cardNumber) / 2;
                 int dayToMemorize = Math.round(f);
-                long dueDate = registrationDate + ((long) dayToMemorize * 86400000L);
+                long dueDate = mMidNight + ((long) dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -533,14 +573,14 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getOnePagePerDayPlan(long registrationDate) {
+        public ArrayList<Card> getOnePagePerDayPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             for (int i = 0; i < mSurahPages; i++) {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfSurah + i;
-                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ",Page " + i + 1;
+                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ", Page " + i + 1;
 
                 com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(mSurahNumber, mQuranMetaDatabase.getSurahEnglishName(mSurahNumber));
 
@@ -549,7 +589,7 @@ public class Plan {
                     ayah = 1;
                 } else ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
-                long dueDate = registrationDate + ((long) cardNumber * 86400000);
+                long dueDate = mMidNight + ((long) cardNumber * 86400000);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -559,7 +599,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getOnePagePerTwoDaysPlan(long registrationDate) {
+        public ArrayList<Card> getOnePagePerTwoDaysPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -576,7 +616,7 @@ public class Plan {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfSurah + i;
-                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ",Page " + i + 1;
+                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ", Page " + i + 1;
 
                 com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(mSurahNumber, mQuranMetaDatabase.getSurahEnglishName(mSurahNumber));
 
@@ -587,7 +627,7 @@ public class Plan {
                 } else ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();
@@ -597,7 +637,7 @@ public class Plan {
             return cards;
         }
 
-        public ArrayList<Card> getOnePagePerThreeDaysPlan(long registrationDate) {
+        public ArrayList<Card> getOnePagePerThreeDaysPlan() {
             ArrayList<Card> cards = new ArrayList<>();
 
             ArrayList<Integer> daysToMemorizeList = new ArrayList<>();
@@ -617,7 +657,7 @@ public class Plan {
 
                 int cardNumber = i + 1; //same as pageNumber , id and title
                 int pageNo = mFirstPageOfSurah + i;
-                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ",Page " + i + 1;
+                String title = mSurahNumber + "." + mQuranMetaDatabase.getSurahEnglishName(mSurahNumber) + ", Page " + i + 1;
 
                 com.nnems.hifzcompanion.models.Surah surah = new com.nnems.hifzcompanion.models.Surah(mSurahNumber, mQuranMetaDatabase.getSurahEnglishName(mSurahNumber));
 
@@ -628,7 +668,7 @@ public class Plan {
                 } else ayah = mQuranMetaDatabase.getPageFirstAyahNumber(pageNo - 1);
 
                 long dayToMemorize = daysToMemorizeList.get(i);
-                long dueDate = registrationDate + (dayToMemorize * 86400000L);
+                long dueDate = mMidNight + (dayToMemorize * 86400000L);
 
                 Date date = new Date(dueDate);
                 String dueDateInWords = date.toString();

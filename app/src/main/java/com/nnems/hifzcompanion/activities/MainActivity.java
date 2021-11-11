@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        mSignInEmailField = findViewById(R.id.singInEmailField);
-        mSignInPasswordField = findViewById(R.id.signgInPasswordField);
+        mSignInEmailField = findViewById(R.id.signInEmailField);
+        mSignInPasswordField = findViewById(R.id.signInPasswordField);
 
         mRegisterTextButton = findViewById(R.id.textView_register);
         mResetPasswordTextButton = findViewById(R.id.textViewResetPassword);

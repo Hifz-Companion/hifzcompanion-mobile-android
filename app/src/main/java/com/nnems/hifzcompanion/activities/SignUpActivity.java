@@ -73,7 +73,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signUp();
-
             }
         });
 
@@ -116,22 +115,15 @@ public class SignUpActivity extends AppCompatActivity {
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d(TAG, "createUserWithEmail:success");
 
-
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     String email = user.getEmail();
                                     String userId = user.getUid();
                                     Calendar c = Calendar.getInstance();
-                                    c.set(Calendar.HOUR_OF_DAY, 0);
-                                    c.set(Calendar.MINUTE, 0);
-                                    c.set(Calendar.SECOND, 0);
-                                    c.set(Calendar.MILLISECOND, 0);
-
                                     Date dateNow = c.getTime();
 
                                     long registrationDate = dateNow.getTime();
 
                                     Map<String, Object> memo = new HashMap<>();
-
 
                                     User newUser = new User(email, registrationDate, memo);
 

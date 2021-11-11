@@ -1,8 +1,16 @@
 package com.nnems.hifzcompanion.activities;
 
+import static com.nnems.hifzcompanion.CONSTANTS.CHANNEL_ID;
+
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +23,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,6 +35,8 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -41,6 +52,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -57,6 +69,8 @@ import com.nnems.hifzcompanion.fragments.DueForRevisionFragment;
 import com.nnems.hifzcompanion.models.Card;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +103,10 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private String mUserId;
     private ProgressDialog mProgressDialog;
     private Map<String, Object> mMemo;
+    private ArrayList<Card> mCards;
+    private AlarmManager alarmMgr;
+    private AlarmManager mAlarmMgr;
+    private PendingIntent mNotificationPendingIntent;
 
 
     @Override
@@ -96,7 +114,12 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        createNotificationChannel();
+
         mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setTitle("Creating Your PLan");
+        mProgressDialog.setMessage("This might take a few moments...");
+        mProgressDialog.setCancelable(false);
         mNavigationView = findViewById(R.id.navigation_view);
 
         // Initialize Firebase Auth
@@ -107,6 +130,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         FirebaseUser user = mAuth.getCurrentUser();
         mEmail = user.getEmail();
         mUserId = user.getUid();
+
+        mCards = new ArrayList<>();
 
         View headerView = mNavigationView.getHeaderView(0);
         TextView userEmailDisplay = headerView.findViewById(R.id.header_user_email_display);
@@ -121,6 +146,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 //            Log.d(TAG, (surahNames + "\n"));
             mSurahNameList.add(surahNames);
         }
+
+        mFabAdd = findViewById(R.id.fabAddPlan);
 
 
         DocumentReference docRef = mDb.collection("users").document(mUserId);
@@ -137,6 +164,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                         mRegistrationDate = document.getLong("registrationDate");
                         mMemo = (Map<String, Object>) document.get("memo");
                         Log.i(TAG, String.valueOf(mRegistrationDate));
+                        if (mMemo.size() <= 0) {
+                            mFabAdd.setVisibility(View.VISIBLE);
+                        }
 
                     } else {
                         Log.d(TAG, "No such document");
@@ -176,19 +206,22 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         viewPagerAdapter.addFragment(mDueForRevisionFragment, "Due For Revision");
         viewPager.setAdapter(viewPagerAdapter);
 
-        mFabAdd = findViewById(R.id.fabAddPlan);
+
         mFabAddQuranPlan = findViewById(R.id.fabQuranPlan);
         mFabAddJuzPlan = findViewById(R.id.fabJuzPlan);
         mFabAddSurahPlan = findViewById(R.id.fabSurahPlan);
+
 
         mAddQuranPlanText = findViewById(R.id.textViewAddQuranPlan);
         mAddJuzPlanText = findViewById(R.id.textViewAddJuzPlan);
         mAddSurahPlanText = findViewById(R.id.textViewAddSurahPlan);
 
+
         isOpen = false;
 
         mFabOpenAnim = AnimationUtils.loadAnimation(this, R.anim.fab_open);
         mFabCloseAnim = AnimationUtils.loadAnimation(this, R.anim.fab_close);
+
 
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,6 +251,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 }
             }
         });
+
 
         mFabAddQuranPlan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,36 +312,67 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                         ProgressDialog progressDialog = new ProgressDialog(DashboardActivity.this);
 
                         Plan.Quran quranPlan = new Plan.Quran(DashboardActivity.this);
-                        ArrayList<Card> cards = new ArrayList<>();
+                        mCards = new ArrayList<>();
                         mTarget = "quran";
 
-
+                        mProgressDialog.show();
                         switch (mQuranPlan) {
                             case "oneYear":
-                                cards = quranPlan.getOneYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ArrayList<Card> cards;
+                                        setUserPlan(quranPlan.getOneYearPlan(), mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "twoYears":
-                                cards = quranPlan.getTwoYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCards = quranPlan.getTwoYearPlan();
+                                        setUserPlan(mCards, mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "threeYears":
-                                cards = quranPlan.getThreeYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCards = quranPlan.getThreeYearPlan();
+                                        setUserPlan(mCards, mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "fourYears":
-                                cards = quranPlan.getFourYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCards = quranPlan.getFourYearPlan();
+                                        setUserPlan(mCards, mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "fiveYears":
-                                cards = quranPlan.getFiveYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCards = quranPlan.getFiveYearPlan();
+                                        setUserPlan(mCards, mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "sixYears":
-                                cards = quranPlan.getSixYearPlan(mRegistrationDate);
-                                setUserPlan(cards, mQuranPlan, mTarget);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mCards = quranPlan.getSixYearPlan();
+                                        setUserPlan(mCards, mQuranPlan, mTarget);
+                                    }
+                                }).start();
                                 break;
                             case "error":
+                                mProgressDialog.dismiss();
                                 Toast.makeText(DashboardActivity.this,
                                         "Please Choose A Plan", Toast.LENGTH_LONG).show();
                                 Log.i(TAG, "Error");
@@ -397,39 +462,71 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                     @Override
                     public void onClick(View v) {
                         Plan.Juz juzPlan = new Plan.Juz(DashboardActivity.this, mJuzNumber);
-                        ArrayList<Card> cards = new ArrayList<>();
+                        mCards.clear();
+                        mCards = new ArrayList<>();
                         mTarget = "juz";
 
                         if (mJuzNumber == 0) {
                             Toast.makeText(DashboardActivity.this, "Please Choose Juz", Toast.LENGTH_LONG).show();
                         } else {
-
+                            mProgressDialog.show();
                             switch (mJuzPlan) {
                                 case "twoWeeks":
-                                    cards = juzPlan.getTwoWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getTwoWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "threeWeeks":
-                                    cards = juzPlan.getThreeWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getThreeWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "fiveWeeks":
-                                    cards = juzPlan.getFiveWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getFiveWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "sixWeeks":
-                                    cards = juzPlan.getSixWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getSixWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "sevenWeeks":
-                                    cards = juzPlan.getSevenWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getSevenWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "nineWeeks":
-                                    cards = juzPlan.getNineWeeksPlan(mRegistrationDate);
-                                    setUserPlan(cards, mJuzPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = juzPlan.getNineWeeksPlan();
+                                            setUserPlan(mCards, mJuzPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "error":
+                                    mProgressDialog.dismiss();
                                     Toast.makeText(DashboardActivity.this,
                                             "Please Choose A Plan", Toast.LENGTH_LONG).show();
                                     Log.i(TAG, "Error");
@@ -514,30 +611,53 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                     public void onClick(View v) {
 
                         Plan.Surah surahPlan = new Plan.Surah(DashboardActivity.this, mSurahNumber);
-                        ArrayList<Card> cards = new ArrayList<>();
+                        mCards.clear();
+                        mCards = new ArrayList<>();
                         mTarget = "surah";
 
                         if (mSurahNumber == 0) {
                             Toast.makeText(DashboardActivity.this, "Please Choose Surah", Toast.LENGTH_SHORT).show();
                         } else {
+                            mProgressDialog.show();
                             switch (mSurahPlan) {
                                 case "twoP/D":
-                                    cards = surahPlan.getTwoPagesPerDayPlan(mRegistrationDate);
-                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = surahPlan.getTwoPagesPerDayPlan();
+                                            setUserPlan(mCards, mSurahPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "oneP/D":
-                                    cards = surahPlan.getOnePagePerDayPlan(mRegistrationDate);
-                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = surahPlan.getOnePagePerDayPlan();
+                                            setUserPlan(mCards, mSurahPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "oneP/2D":
-                                    cards = surahPlan.getOnePagePerTwoDaysPlan(mRegistrationDate);
-                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = surahPlan.getOnePagePerTwoDaysPlan();
+                                            setUserPlan(mCards, mSurahPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "oneP/3D":
-                                    cards = surahPlan.getOnePagePerThreeDaysPlan(mRegistrationDate);
-                                    setUserPlan(cards, mSurahPlan, mTarget);
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mCards = surahPlan.getOnePagePerThreeDaysPlan();
+                                            setUserPlan(mCards, mSurahPlan, mTarget);
+                                        }
+                                    }).start();
                                     break;
                                 case "error":
+                                    mProgressDialog.dismiss();
                                     Toast.makeText(DashboardActivity.this,
                                             "Please Choose A Plan", Toast.LENGTH_LONG).show();
                                     Log.i(TAG, "Error");
@@ -545,8 +665,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
                             }
                         }
-
-
                         show.dismiss();
                     }
                 });
@@ -557,11 +675,58 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
     }
 
+    private void sendNotification(Context context) {
+        Intent intent = new Intent(context, SplashScreenActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_quran_notification_icon)
+                .setContentTitle("Hifz Companion")
+                .setContentText("Card due for memorization")
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent);
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+        notificationManagerCompat.notify(123, builder.build());
+
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+        }
+    }
+
     private void setUserPlan(ArrayList<Card> cards, String plan, String target) {
 
         Map<String, Object> memo = new HashMap<>();
 
-        long startDate = mRegistrationDate + 86400000L;
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        Date dateNow = c.getTime();
+
+
+        long midNight = dateNow.getTime();
+
+        long startDate = midNight + 86400000L;
 
         memo.put("plan", plan);
         memo.put("target", target);
@@ -569,10 +734,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         memo.put("startDate", startDate);
 
         Map<String, Object> userPlan = new HashMap<>();
-        userPlan.put("email", mEmail);
         userPlan.put("memo", memo);
-        userPlan.put("registrationDate", mRegistrationDate);
 
+//        mProgressDialog.dismiss();
 
         mDb.collection("users")
                 .document(mUserId)
@@ -582,15 +746,40 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
                 showSnackbar(getString(R.string.hifz_plan_created_snackbar_text));
                 Log.d(TAG, mEmail + " Plan added");
+                mProgressDialog.dismiss();
+                mFabAdd.setVisibility(View.INVISIBLE);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+
+                showSnackbar(getString(R.string.error_creating_plan_message));
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Log.d(TAG, mEmail + " Plan not added");
+                mProgressDialog.dismiss();
             }
         });
 
+    }
+
+    private void startNotification() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 00);
+
+        mAlarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        mNotificationPendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+        mAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_HALF_DAY, mNotificationPendingIntent);
+    }
+
+    private void stopNotification() {
+        if (alarmMgr != null) {
+            if (mNotificationPendingIntent != null) {
+                alarmMgr.cancel(mNotificationPendingIntent);
+            }
+        }
     }
 
     private void showSnackbar(String snackbarMessage) {
@@ -614,6 +803,22 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
             case R.id.nav_help:
                 Intent helpActivity = new Intent(DashboardActivity.this, HelpActivity.class);
                 startActivity(helpActivity);
+                break;
+
+            case R.id.nav_notification_switch:
+                SwitchMaterial switchMaterial = (SwitchMaterial) item.getActionView().findViewById(R.id.switch_notification_toggle);
+                switchMaterial.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked == true) {
+                            startNotification();
+                            Toast.makeText(DashboardActivity.this, "Notification Enabled", Toast.LENGTH_SHORT).show();
+                        } else {
+                            stopNotification();
+                            Toast.makeText(DashboardActivity.this, "Notification Disabled", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
                 break;
         }
         mDrawer.closeDrawer(GravityCompat.START);
@@ -664,6 +869,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Toast.makeText(DashboardActivity.this, "Your current plan has been deleted", Toast.LENGTH_LONG).show();
+                                mFabAdd.setVisibility(View.VISIBLE);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override

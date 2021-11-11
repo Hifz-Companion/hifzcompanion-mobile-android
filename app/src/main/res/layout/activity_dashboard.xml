@@ -37,10 +37,10 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tabBackground="@color/purple_500"
                 app:tabGravity="fill"
+                app:tabIndicatorColor="@color/white"
+                app:tabIndicatorHeight="2dp"
                 app:tabMaxWidth="0dp"
                 app:tabSelectedTextColor="@color/white"
-                app:tabIndicatorHeight="2dp"
-                app:tabIndicatorColor="@color/white"
                 app:tabTextColor="@color/darker_white" />
 
             <androidx.viewpager.widget.ViewPager
@@ -94,13 +94,13 @@
                 android:visibility="invisible"
                 app:backgroundTint="@color/purple_500"
                 app:fabSize="mini"
-                app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+                app:layout_constraintBottom_toTopOf="@+id/fab_coordinatorLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/ic_fab_surah" />
 
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/coordinatorLayout"
+                android:id="@+id/fab_coordinatorLayout"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -114,6 +114,7 @@
                     android:layout_gravity="bottom|end"
                     android:layout_margin="32dp"
                     android:src="@drawable/ic_fab_open"
+                    android:visibility="invisible"
                     app:backgroundTint="@color/purple_500"
                     app:fabSize="normal"
                     app:rippleColor="@color/lightGrey" />
@@ -124,7 +125,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
                 android:background="@drawable/fab_text_bg"
                 android:paddingLeft="16dp"
                 android:paddingTop="5dp"

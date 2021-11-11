@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -98,10 +99,10 @@ public class DueForMemorizationFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     assert document != null;
                     if (document.exists()) {
-                        if (document.get("memo") != null) {
+                        mMemo = (Map<String, Object>) document.get("memo");
 
-                            mMemo = (Map<String, Object>) document.get("memo");
-
+                        assert mMemo != null;
+                        if ( mMemo.size() > 0 ) {
 
                             mCards = (ArrayList<Map<String, Object>>) mMemo.get("cards");
 
@@ -136,13 +137,20 @@ public class DueForMemorizationFragment extends Fragment {
                             if (!mDueCards.isEmpty()) {
                                 mDueForMemorizingRecyclerAdapter = new DueForMemorizingRecyclerAdapter(getActivity(), mMemo, mDueCards, mUserId);
                                 mDueForMemorizingRecyclerView.setAdapter(mDueForMemorizingRecyclerAdapter);
+
                             } else {
                                 mNoDueMemorizingCardsTV.setVisibility(View.VISIBLE);
+                                if (mSwipeRefreshLayout.isRefreshing()) {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
                             }
                             Log.d(TAG, "onComplete: DueCards " + mDueCards.size());
-                        } else {
+                        } else if(mMemo.size() <= 0) {
                             mNoDueMemorizingCardsTV.setText(R.string.no_ongoing_plan_create_plan);
                             mNoDueMemorizingCardsTV.setVisibility(View.VISIBLE);
+                            if (mSwipeRefreshLayout.isRefreshing()) {
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
                         }
                     } else {
                         Log.d(TAG, "No such document");

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".fragments.DueForMemorizationFragment">
 
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/due_for_memorizing_fragment_swiperefreshlayout"
         android:layout_width="wrap_content"

@@ -12,6 +12,7 @@
     <color name="darker_white">#CCCCCC</color>
     <color name="yellow">#EACE09</color>
     <color name="blue">#00008b</color>
+    <color name="lightBlue">#3273a8</color>
     <color name="lightGrey">#5F6670</color>
     <color name="deepYellow">#999900</color>
 </resources>

@@ -99,9 +99,11 @@ public class DueForRevisionFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     assert document != null;
                     if (document.exists()) {
-                        if (document.get("memo") != null) {
+                        mMemo = (Map<String, Object>) document.get("memo");
+                        assert mMemo != null;
+                        if (mMemo.size() > 0 ) {
 
-                            mMemo = (Map<String, Object>) document.get("memo");
+
 
 
                             mCards = (ArrayList<Map<String, Object>>) mMemo.get("cards");
@@ -138,13 +140,20 @@ public class DueForRevisionFragment extends Fragment {
                             if (!mMDueCards.isEmpty()) {
                                 mDueForRevisionRecyclerAdapter = new DueForRevisionRecyclerAdapter(getActivity(), mMemo, mMDueCards, mUserId);
                                 mDueForRevisionRecyclerView.setAdapter(mDueForRevisionRecyclerAdapter);
+
                             } else {
                                 mNoDueRevisionCardsTV.setVisibility(View.VISIBLE);
+                                if (mSwipeRefreshLayout.isRefreshing()) {
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
                             }
 
-                        } else {
+                        } else if(mMemo.size() <= 0) {
                             mNoDueRevisionCardsTV.setText(R.string.no_ongoing_plan_create_plan);
                             mNoDueRevisionCardsTV.setVisibility(View.VISIBLE);
+                            if (mSwipeRefreshLayout.isRefreshing()) {
+                                mSwipeRefreshLayout.setRefreshing(false);
+                            }
                         }
 
                     } else {

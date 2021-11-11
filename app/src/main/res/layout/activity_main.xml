@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/singInEmailField"
+                android:id="@+id/signInEmailField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress" />
@@ -48,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/signInEmailtextInputLayout">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/signgInPasswordField"
+                android:id="@+id/signInPasswordField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword" />
